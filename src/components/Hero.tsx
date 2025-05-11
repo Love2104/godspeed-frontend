@@ -21,7 +21,7 @@ const Hero: React.FC = () => (
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center opacity-0 animate-fade-in-up delay-300">
         <a
-          href="https://godspeed.systems/docs/getting-started"
+          href="https://godspeed.systems/docs"
           target="_blank"
           rel="noopener noreferrer"
           className="px-8 py-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition font-semibold text-lg transform hover:scale-105 active:scale-95"
