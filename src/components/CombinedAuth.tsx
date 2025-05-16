@@ -33,6 +33,7 @@ const CombinedAuth: React.FC<CombinedAuthProps> = ({ setIsLoggedIn }) => {
           setMessage("Registration successful! 🎉");
           setIsLoggedIn(true);
           localStorage.setItem("isLoggedIn", "1");
+          localStorage.setItem("user", JSON.stringify({ name, email })); // Save user info
           setTimeout(() => {
             navigate("/", { replace: true });
           }, 1200);
@@ -47,15 +48,19 @@ const CombinedAuth: React.FC<CombinedAuthProps> = ({ setIsLoggedIn }) => {
         });
         data = await res.json();
         if (data && data.success) {
-      
           setMessage("Login successful! 🚀");
           setIsLoggedIn(true);
           localStorage.setItem("isLoggedIn", "1");
+          // Use data.user if backend returns user info, else fallback to email
+          if (data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+          } else {
+            localStorage.setItem("user", JSON.stringify({ email }));
+          }
           setTimeout(() => {
             navigate("/", { replace: true });
           }, 1200);
         } else {
-         
           setMessage(data?.message || "Login failed.");
         }
       }

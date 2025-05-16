@@ -7,7 +7,7 @@ const navLinks = [
   { name: "Team", href: "#team" },
   { name: "About", href: "#about" },
   { name: "Pricing", href: "#pricing" },
-  { name: "Sign In / Register", href: "/auth" }, // Combined auth link
+  { name: "Sign In / Register", href: "/auth" },
 ];
 
 const Navbar: React.FC = () => {
@@ -17,8 +17,15 @@ const Navbar: React.FC = () => {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("theme") === "dark"
   );
+  const [userName, setUserName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Update userName on route change
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserName(user?.name || "");
+  }, [location.pathname]);
 
   // Highlight the correct nav link for /auth route
   useEffect(() => {
@@ -91,6 +98,24 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    setUserName("");
+    navigate("/");
+  };
+
+  // Prepare nav links, replacing auth link with user name if logged in
+  const dynamicNavLinks = navLinks.map(link => {
+    if (link.href === "/auth") {
+      return {
+        ...link,
+        name: localStorage.getItem("isLoggedIn") ? userName : link.name
+      };
+    }
+    return link;
+  });
+
   return (
     <nav
       className={`fixed w-full top-0 left-0 z-50 transition-all duration-300
@@ -106,29 +131,43 @@ const Navbar: React.FC = () => {
           </span>
         </div>
         <ul className="hidden md:flex space-x-6">
-          {navLinks.map((link) => (
+          {dynamicNavLinks.map((link) => (
             <li key={link.href} className="relative group">
-              <button
-                className={`px-3 py-2 font-medium transition text-lg
-                  ${
-                    active === link.href
-                      ? "text-blue-700 dark:text-blue-300"
-                      : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-                  }
-                `}
-                onClick={e => handleNavClick(link.href, e)}
-              >
-                {link.name}
-                <span
-                  className={`block h-0.5 rounded transition-all duration-300
+              {link.href === "/auth" && localStorage.getItem("isLoggedIn") ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                    {userName}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                  >
+                    (Logout)
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={`px-3 py-2 font-medium transition text-lg
                     ${
                       active === link.href
-                        ? "w-full bg-blue-600 dark:bg-blue-400 mt-1"
-                        : "w-0 bg-blue-600 dark:bg-blue-400 group-hover:w-full mt-1"
+                        ? "text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
                     }
                   `}
-                ></span>
-              </button>
+                  onClick={e => handleNavClick(link.href, e)}
+                >
+                  {link.name}
+                  <span
+                    className={`block h-0.5 rounded transition-all duration-300
+                      ${
+                        active === link.href
+                          ? "w-full bg-blue-600 dark:bg-blue-400 mt-1"
+                          : "w-0 bg-blue-600 dark:bg-blue-400 group-hover:w-full mt-1"
+                      }
+                    `}
+                  ></span>
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -162,20 +201,34 @@ const Navbar: React.FC = () => {
       </div>
       {menuOpen && (
         <ul className="md:hidden bg-white dark:bg-gray-900 shadow-lg px-6 py-4 space-y-2">
-          {navLinks.map((link) => (
+          {dynamicNavLinks.map((link) => (
             <li key={link.href}>
-              <button
-                className={`block w-full text-left px-3 py-2 rounded transition
-                  ${
-                    active === link.href
-                      ? "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold"
-                      : "hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200"
-                  }
-                `}
-                onClick={e => handleNavClick(link.href, e)}
-              >
-                {link.name}
-              </button>
+              {link.href === "/auth" && localStorage.getItem("isLoggedIn") ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                    {userName}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400"
+                  >
+                    (Logout)
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={`block w-full text-left px-3 py-2 rounded transition
+                    ${
+                      active === link.href
+                        ? "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold"
+                        : "hover:bg-blue-50 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 text-gray-700 dark:text-gray-200"
+                    }
+                  `}
+                  onClick={e => handleNavClick(link.href, e)}
+                >
+                  {link.name}
+                </button>
+              )}
             </li>
           ))}
         </ul>
