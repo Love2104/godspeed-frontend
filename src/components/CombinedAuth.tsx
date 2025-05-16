@@ -46,7 +46,7 @@ const CombinedAuth: React.FC<CombinedAuthProps> = ({ setIsLoggedIn }) => {
       let res, data;
       if (isNewUser) {
         // Register
-        res = await fetch("http://localhost:3000/register", {
+        res = await fetch("https://godspeed-backend-dncc.onrender.com/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, password }),
@@ -64,7 +64,7 @@ const CombinedAuth: React.FC<CombinedAuthProps> = ({ setIsLoggedIn }) => {
         }
       } else {
         // Login
-        res = await fetch("http://localhost:3000/login", {
+        res = await fetch("https://godspeed-backend-dncc.onrender.com/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
